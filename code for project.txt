@@ -1,0 +1,93 @@
+
+USE CarRentalDB;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS Payments;
+DROP TABLE IF EXISTS Rentals;
+DROP TABLE IF EXISTS Customers;
+DROP TABLE IF EXISTS Vehicles;
+SET FOREIGN_KEY_CHECKS = 1;
+
+CREATE TABLE Vehicles (
+    vehicle_id INT AUTO_INCREMENT PRIMARY KEY,
+    registration_no VARCHAR(20) UNIQUE NOT NULL,
+    brand VARCHAR(50) NOT NULL,
+    model VARCHAR(50) NOT NULL,
+    daily_rate DECIMAL(10,2) NOT NULL,
+    status VARCHAR(20) DEFAULT 'Available'
+);
+
+CREATE TABLE Customers (
+    customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    phone VARCHAR(15),
+    email VARCHAR(100),
+    license_no VARCHAR(30) UNIQUE NOT NULL
+);
+
+CREATE TABLE Rentals (
+    rental_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    vehicle_id INT NOT NULL,
+    rental_date DATE NOT NULL,
+    expected_return DATE NOT NULL,
+    actual_return DATE,
+    total_cost DECIMAL(10,2) DEFAULT 0,
+    status VARCHAR(20) DEFAULT 'Booked',
+    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id),
+    FOREIGN KEY (vehicle_id) REFERENCES Vehicles(vehicle_id)
+);
+
+CREATE TABLE Payments (
+    payment_id INT AUTO_INCREMENT PRIMARY KEY,
+    rental_id INT NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    payment_date DATE NOT NULL,
+    payment_method VARCHAR(30),
+    payment_status VARCHAR(20) DEFAULT 'Pending',
+    FOREIGN KEY (rental_id) REFERENCES Rentals(rental_id)
+);
+
+INSERT INTO Vehicles
+(registration_no, brand, model, daily_rate, status)
+VALUES
+('GJ01AB1234', 'Maruti Suzuki', 'Swift', 1500, 'Available'),
+('GJ06CD5678', 'Hyundai', 'Creta', 2500, 'Available'),
+('GJ01EF9012', 'Tata', 'Nexon', 2200, 'Available'),
+('GJ23GH3456', 'Honda', 'City', 2000, 'Available'),
+('GJ06IJ7890', 'Toyota', 'Innova', 3000, 'Maintenance');
+
+INSERT INTO Customers
+(full_name, phone, email, license_no)
+VALUES
+('Aarav Patel', '9876500001', 'aarav@example.com', 'DL1001'),
+('Diya Shah', '9876500002', 'diya@example.com', 'DL1002'),
+('Krish Mehta', '9876500003', 'krish@example.com', 'DL1003'),
+('Anaya Desai', '9876500004', 'anaya@example.com', 'DL1004'),
+('Rohan Joshi', '9876500005', 'rohan@example.com', 'DL1005');
+
+INSERT INTO Rentals
+(customer_id, vehicle_id, rental_date, expected_return,
+ actual_return, total_cost, status)
+VALUES
+(1, 1, '2026-10-01', '2026-10-03', '2026-10-03', 3000, 'Returned'),
+(2, 2, '2026-10-05', '2026-10-07', '2026-10-07', 5000, 'Returned'),
+(3, 3, '2026-10-27', '2026-10-29', NULL, 4400, 'Active'),
+(4, 4, '2026-10-28', '2026-10-30', NULL, 4000, 'Booked'),
+(5, 1, '2026-11-05', '2026-11-07', NULL, 3000, 'Booked');
+
+INSERT INTO Payments
+(rental_id, amount, payment_date, payment_method, payment_status)
+VALUES
+(1, 3000, '2026-10-01', 'UPI', 'Paid'),
+(2, 5000, '2026-10-05', 'Card', 'Paid'),
+(3, 2000, '2026-10-27', 'UPI', 'Paid'),
+(4, 1000, '2026-10-27', 'Cash', 'Pending'),
+(5, 3000, '2026-10-27', 'Bank Transfer', 'Paid');
+
+SHOW TABLES;
+
+SELECT * FROM Vehicles;
+SELECT * FROM Customers;
+SELECT * FROM Rentals;
+SELECT * FROM Payments;
